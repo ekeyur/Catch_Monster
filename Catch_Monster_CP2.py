@@ -6,6 +6,7 @@ KEY_UP = 273
 KEY_DOWN = 274
 KEY_LEFT = 276
 KEY_RIGHT = 275
+K_RETURN = 13
 
 
 class Character(object):
@@ -21,6 +22,7 @@ class Character(object):
 
 
 class Monster(Character):
+
     def __init__(self):
         self.x = r(20,480)
         self.y = r(20,430)
@@ -28,8 +30,6 @@ class Monster(Character):
         self.speed_y = 1
         self.image = pygame.image.load('monster.png').convert_alpha()
         self.name = 'monster'
-
-
 
     def direction(self,d):
         if d == 1:
@@ -59,6 +59,44 @@ class Monster(Character):
             self.y = height - 5
 
 
+class Goblin(Character):
+
+    def __init__(self):
+        self.x = r(20,480)
+        self.y = r(20,430)
+        self.speed_x = 1
+        self.speed_y = 1
+        self.image = pygame.image.load('goblin.png').convert_alpha()
+        self.name = 'goblin'
+
+    def direction(self,d):
+        if d == 1:
+            self.speed_x = 0
+            self.speed_y = -.1
+        if d == 2:
+            self.speed_x = 0
+            self.speed_y = 1
+        if d == 3:
+            self.speed_x = -1
+            self.speed_y = 0
+        if d == 4:
+            self.speed_x = 1
+            self.speed_y = 0
+
+    def wrap(self,width,height):
+        self.x += self.speed_x
+        self.y += self.speed_y
+
+        if self.x > width - 5:
+            self.x = 5
+        if self.y > height-5:
+            self.y = 5
+        if self.x < 5:
+            self.x = width - 5
+        if self.y < 5:
+            self.y = height - 5
+
+
 
 class Hero(Character):
     def __init__(self):
@@ -68,7 +106,7 @@ class Hero(Character):
         self.speed_y = 0
         self.image = pygame.image.load('hero.png').convert_alpha()
         self.name = 'hero'
-        self.collision = False
+        self.colided = False
 
     def direction(self,d):
         if d == 1:
@@ -99,8 +137,8 @@ class Hero(Character):
 
     def collision(self,dist):
         if dist < 32:
-            self.collision = True
-        return self.collision
+            self.colided = True
+
 
 def main():
     # declare the size of the canvas
@@ -108,15 +146,12 @@ def main():
     height = 480
     #blue_color = (97, 159, 182)
     pygame.mixer.init()
-    sound = pygame.mixer.Sound('sounds/win.wav')
+    sound = pygame.mixer.Sound('win.wav')
 
     # initialize the pygame framework
     pygame.init()
 
     direction = 1
-
-
-
     # create screen
     screen = pygame.display.set_mode((width, height))
 
@@ -135,23 +170,31 @@ def main():
     # game loop
     monster = Monster()
     hero = Hero()
-
+    goblin = Goblin()
 
 
     stop_game = False
     counter = 1
+    #play_again = True
 
     while not stop_game:
+        # when there is a collision
+
+            # play_again = False
+            # pygame.display.set_caption('Hit Enter to play again!')
         # look through user events fired
         for event in pygame.event.get():
+
+
             ################################
             # PUT EVENT HANDLING CODE HERE #
             ################################
-
             # Moving Hero around code with keypress event
+
             if event.type == pygame.KEYDOWN:
                 # activate the cooresponding speeds
                 # when an arrow key is pressed down
+
                 if event.key == KEY_DOWN:
                     hero.speed_y = 5
                 elif event.key == KEY_UP:
@@ -160,6 +203,9 @@ def main():
                     hero.speed_x = -5
                 elif event.key == KEY_RIGHT:
                     hero.speed_x = 5
+                elif event.key == K_RETURN:
+                    hero.colided = False
+
 
             if event.type == pygame.KEYUP:
                 # deactivate the cooresponding speeds
@@ -183,23 +229,38 @@ def main():
         #######################################
         screen.blit(background,(0,0))
 
-        hero.wrap(width,height)
+        myfont = pygame.font.SysFont("monospace", 35)
+        label = myfont.render("Hit Enter to play again!", 1, (255,255,0))
 
-        # hero.x += hero.speed_x
-        # hero.y += hero.speed_y
-        # Rendering hero
+
+        # rendering monster & hero
+        hero.wrap(width,height)
         hero.render(screen)
 
-        dist = math.sqrt(((monster.x - hero.x) ** 2) + ((monster.y - hero.y) ** 2))
-
-
-        if dist <= 32:
-            monster.display = False
+        goblin.wrap(width,height)
+        goblin.render(screen)
 
         monster.wrap(width,height)
 
-        # monster.x += monster.speed_x
-        # monster.y += monster.speed_y
+        if not hero.colided:
+            monster.render(screen)
+        else:
+            sound.play(1)
+            pygame.display.set_caption('Hit Enter to play again!')
+            screen.blit(label, (140,150))
+            #stop_game = True
+
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == K_RETURN:
+            #         stop_game = False
+            #         hero.colided = False
+            #         print event.key
+            #     pass
+
+
+        dist = math.sqrt(((monster.x - hero.x) ** 2) + ((monster.y - hero.y) ** 2))
+
+        hero.collision(dist)
 
         # Counter to change direction every 80 moves
         counter +=1
@@ -207,9 +268,6 @@ def main():
             monster.direction(r(1,4))
             counter = 0
 
-        # rendering monster
-
-        monster.render(screen)
         ################################
         # PUT CUSTOM DISPLAY CODE HERE #
         ################################
