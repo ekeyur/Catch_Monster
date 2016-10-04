@@ -35,21 +35,6 @@ class Character(object):
             self.speed_x = 2
             self.speed_y = 0
 
-
-class Monster(Character):
-
-    def __init__(self):
-        self.x = r(20,480)
-        self.y = r(20,430)
-        self.speed_x = 1
-        self.speed_y = 1
-        self.image = pygame.image.load('monster.png').convert_alpha()
-        self.name = 'monster'
-
-    def direction(self):
-
-        super(Monster,self).direction()
-
     def wrap(self,width,height):
         self.x += self.speed_x
         self.y += self.speed_y
@@ -62,6 +47,20 @@ class Monster(Character):
             self.x = width - 5
         if self.y < 5:
             self.y = height - 5
+
+
+class Monster(Character):
+
+    def __init__(self):
+        self.x = r(20,480)
+        self.y = r(20,430)
+        self.speed_x = 1
+        self.speed_y = 1
+        self.image = pygame.image.load('monster.png').convert_alpha()
+        self.name = 'monster'
+
+    # def direction(self):
+    #     super(Monster,self).direction()
 
 
 class Goblin(Character):
@@ -88,21 +87,6 @@ class Goblin(Character):
         if d == 4:
             self.speed_x = 1
             self.speed_y = 0
-
-
-    def wrap(self,width,height):
-        self.x += self.speed_x
-        self.y += self.speed_y
-
-        if self.x > width - 5:
-            self.x = 5
-        if self.y > height-5:
-            self.y = 5
-        if self.x < 5:
-            self.x = width - 5
-        if self.y < 5:
-            self.y = height - 5
-
 
 
 class Hero(Character):
