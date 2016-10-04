@@ -101,20 +101,25 @@ class Hero(Character):
         self.colided_with_goblin = False
         self.level = 1
 
-    # def direction(self):
-    #     d = rand(1,4)
-    #     if d == 1:
-    #         self.speed_x = 0
-    #         self.speed_y = -2
-    #     if d == 2:
-    #         self.speed_x = 0
-    #         self.speed_y = 2
-    #     if d == 3:
-    #         self.speed_x = -2
-    #         self.speed_y = 0
-    #     if d == 4:
-    #         self.speed_x = 2
-    #         self.speed_y = 0
+    def process_event(self,event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == KEY_DOWN:
+                self.speed_y = 5
+            elif event.key == KEY_UP:
+                self.speed_y = -5
+            elif event.key == KEY_LEFT:
+                self.speed_x = -5
+            elif event.key == KEY_RIGHT:
+                self.speed_x = 5
+        if event.type == pygame.KEYUP:
+            if event.key == KEY_DOWN:
+                self.speed_y = 0
+            elif event.key == KEY_UP:
+                self.speed_y = 0
+            elif event.key == KEY_LEFT:
+                self.speed_x = 0
+            elif event.key == KEY_RIGHT:
+                self.speed_x = 0
 
     def wrap(self,width,height):
         self.x += self.speed_x
@@ -194,20 +199,11 @@ def main():
             # PUT EVENT HANDLING CODE HERE #
             ################################
             # Moving Hero around code with keypress event
+            hero.process_event(event)
 
             if event.type == pygame.KEYDOWN:
-                # activate the cooresponding speeds
-                # when an arrow key is pressed down
 
-                if event.key == KEY_DOWN:
-                    hero.speed_y = 5
-                elif event.key == KEY_UP:
-                    hero.speed_y = -5
-                elif event.key == KEY_LEFT:
-                    hero.speed_x = -5
-                elif event.key == KEY_RIGHT:
-                    hero.speed_x = 5
-                elif event.key == K_RETURN:
+                if event.key == K_RETURN:
                     if hero.colided_with_monster:
                         game_over = False
                         hero.level += 1
@@ -215,17 +211,6 @@ def main():
                         hero.colided_with_monster = False
                     if hero.colided_with_goblin:
                         hero.colided_with_goblin = False
-            if event.type == pygame.KEYUP:
-                # deactivate the cooresponding speeds
-                # when an arrow key is released
-                if event.key == KEY_DOWN:
-                    hero.speed_y = 0
-                elif event.key == KEY_UP:
-                    hero.speed_y = 0
-                elif event.key == KEY_LEFT:
-                    hero.speed_x = 0
-                elif event.key == KEY_RIGHT:
-                    hero.speed_x = 0
 
             if event.type == pygame.QUIT:
                 # if they closed the window, set stop_game to True
